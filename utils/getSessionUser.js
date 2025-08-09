@@ -12,5 +12,6 @@ export const getSessionUser = async () => {
     userId: session.user.id, // 👈 this must exist
     name: session.user.name,
     email: session.user.email,
+    image: session.user.image,
   };
 };

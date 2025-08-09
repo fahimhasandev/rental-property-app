@@ -11,7 +11,7 @@ import { convertToSerializableObject } from "@/utils/convertToObject";
 const ProfilePage = async () => {
   await connectDB();
 
-  const sessionUser = await getSessionUser(authOptions);
+  const sessionUser = await getSessionUser();
 
   console.log(sessionUser);
 
@@ -36,10 +36,10 @@ const ProfilePage = async () => {
               <div className="mb-4">
                 <Image
                   className="h-32 w-32 md:h-48 md:w-48 rounded-full mx-auto md:mx-0"
-                  src={sessionUser.userId.image || profileDefault}
+                  src={sessionUser.image || profileDefault}
                   alt="User"
-                  width="0"
-                  height="0"
+                  width="32"
+                  height="32"
                 />
               </div>
 

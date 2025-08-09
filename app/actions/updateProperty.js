@@ -1,14 +1,12 @@
 "use server";
 
-import cloudinary from "@/config/cloudinary";
 import { connectDB } from "@/config/database";
 import Property from "@/models/Property";
 import { getSessionUser } from "@/utils/getSessionUser";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { toast } from "react-toastify";
 
-async function addProperty(formData) {
+async function updateProperty(propertyId, formData) {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -21,13 +19,15 @@ async function addProperty(formData) {
 
   const { userId } = sessionUser;
 
-  // access all values from amenities and images
-  const amenities = formData.getAll("amenities");
+  const existingProperty = await Property.findById(propertyId);
 
-  // return array of File objects, filtering out empty ones
-  const images = formData
-    .getAll("images")
-    .filter((image) => image && image.name !== "");
+  //Varify Ownership
+  if (existingProperty.owner.toString() !== userId) {
+    throw new Error("Current User does not own this property");
+  }
+
+  // access all values from amenities and images
+  // const amenities = formData.getAll("amenities");
 
   const propertyData = {
     owner: userId,
@@ -43,7 +43,7 @@ async function addProperty(formData) {
     beds: Number(formData.get("beds")),
     baths: Number(formData.get("baths")),
     square_feet: Number(formData.get("square_feet")),
-    amenities,
+    amenities: formData.getAll("amenities"),
     rates: {
       nightly: formData.get("rates.nightly"),
       weekly: formData.get("rates.weekly"),
@@ -56,38 +56,14 @@ async function addProperty(formData) {
     },
   };
 
-  const imageUrls = [];
+  const updatedProperty = await Property.findByIdAndUpdate(
+    propertyId,
+    propertyData
+  );
 
-  // File → ArrayBuffer → Uint8Array → Buffer → Base64
-  for (const imageFile of images) {
-    const imageBuffer = await imageFile.arrayBuffer();
-    const imageArray = Array.from(new Uint8Array(imageBuffer));
-    const imageData = Buffer.from(imageArray);
-
-    // Convert to base64
-    const imageBase64 = imageData.toString("base64");
-
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(
-      `data:image/png;base64,${imageBase64}`,
-      { folder: "propertypulse" }
-    );
-
-    imageUrls.push(result.secure_url);
-  }
-
-  // ✅ FIXED: use the correct variable
-  propertyData.images = imageUrls;
-
-  const newProperty = new Property(propertyData);
-  await newProperty.save();
-
-  // revalidate
   revalidatePath("/", "layout");
 
-  // redirect to new property page
-  redirect(`/properties/${newProperty._id}`);
-  toast.success("Listing Added Successfully");
+  redirect(`/properties/${updatedProperty._id}`);
 }
 
-export default addProperty;
+export default updateProperty;

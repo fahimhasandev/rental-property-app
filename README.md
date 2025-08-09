@@ -342,5 +342,17 @@ export const config = {
 
 async function addProperty(formData) {}
 ```
+
 ## Custom Error Page
+
 app folder --> create `app/error.jsx`
+
+# Section - 6: Profile & Manage Properties
+
+## 50. Toast Notifications
+
+1. `npm i react-toastify`
+
+# Section - 7: Map, bookmarks, & sharing
+
+`npm i react-geocode mapbox-gl react-map-gl`

@@ -3,5 +3,5 @@ export default function proxy(request) {
 }
 
 export const config = {
-  matcher: ["/properties/add", "/prfile", "/properties/saved", "/messages"],
+  matcher: ["/properties/:id*", "/prfile", "/properties/saved", "/messages"],
 };
