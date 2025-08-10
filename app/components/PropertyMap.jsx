@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fromAddress, setDefaults } from "react-geocode";
+import Spinner from "./Spinner";
+import Map, { Marker } from "react-map-gl/mapbox";
+import "mapbox-gl/dist/mapbox-gl.css";
+import Image from "next/image";
+import pin from "@/assets/images/pin.svg";
 
-const PropertyMap = () => {
+const PropertyMap = ({ property }) => {
   const [lat, setLat] = useState(null);
   const [lng, setLng] = useState(null);
   const [viewport, setViewPort] = useState({
@@ -23,9 +29,29 @@ const PropertyMap = () => {
   });
 
   useEffect(() => {
-    const fetcCords = async () => {
+    const fetchCoords = async () => {
       try {
-        const res = await fromAddress()
+        const res = await fromAddress(
+          `${property.location.street} ${property.location.city} ${property.location.state} ${property.location.zipcode}`
+        );
+
+        // check geocode result
+        if (res.results.length === 0) {
+          setGeoCodeError(true);
+          return;
+        }
+
+        const { lat, lng } = await res.results[0].geometry.location;
+
+        setLat(lat);
+        setLng(lng);
+
+        setViewPort({
+          ...viewport,
+          lattitude: lat,
+          longitude: lng,
+        });
+        console.log(lat, lng);
       } catch (error) {
         console.log(error);
         setGeoCodeError(true);
@@ -33,9 +59,35 @@ const PropertyMap = () => {
         setLoading(false);
       }
     };
+
+    fetchCoords();
   }, []);
 
-  return <div>PropertyMap</div>;
+  if (loading) return <Spinner />;
+
+  if (geoCodeError)
+    return <div className="text-xl">No Location Data Found</div>;
+
+  return (
+    !loading && (
+      <Map
+        mapLib={import("mapbox-gl")}
+        // https://visgl.github.io/react-map-gl/docs/get-started/mapbox-tokens
+        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+        initialViewState={{
+          longitude: lng,
+          latitude: lat,
+          zoom: 15,
+        }}
+        style={{ width: "100%", height: 500 }}
+        mapStyle="mapbox://styles/mapbox/streets-v9"
+      >
+        <Marker longitude={lng} latitude={lat} anchor="bottom">
+          <Image src={pin} alt="location" width={40} height={40} />
+        </Marker>
+      </Map>
+    )
+  );
 };
 
 export default PropertyMap;
