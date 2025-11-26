@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const pathname = usePathname();
 
   return (
@@ -81,9 +81,9 @@ const Navbar = () => {
                 </Link>
                 {isLoggedIn && (
                   <Link
-                    href="/add-property"
+                    href="/properties/add"
                     className={` ${
-                      pathname === "/add-property" ? "bg-black" : ""
+                      pathname === "/properties/add" ? "bg-black" : ""
                     } text-white  hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
                   >
                     Add Property

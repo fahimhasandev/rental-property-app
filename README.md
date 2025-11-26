@@ -1,6 +1,7 @@
 `create-next-app`
 
 ## Getting Started
+
 First, run the development server:
 
 ```bash
@@ -139,11 +140,25 @@ export default PropertyPage;
 
 ## Navbar Links, Dropdown State, Icons
 
-### icons --> `npm i react-icons`
+### icons
+
+--> `npm i react-icons`
 
 ### Navbar Link
 
-- conditional
+- conditionally render the login and logout
+
+```jsx
+const [isLoggedIn, setIsLoggedIn] = useState(false); // meaning initially, we are not logged in yet
+!isLoggedIn && "show the login button";
+{
+  !isLoggedIn && <button>Login</button>;
+}
+```
+
+**Meaning:**
+• When user is NOT logged in → show login button
+• When user IS logged in → hide login button
 
 ```tsx
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -152,3 +167,68 @@ onClick={() => setIsMobileMenuOpen((prev) => !prev)}
 ```
 
 ## Active Links & Conditional Rendering
+
+## HomePage Components and Footer
+
+## Property Page & PropertyCard Component
+
+How to convert monthly and weekly price
+
+```tsx
+const getRateDisplay = () => {
+  const { rates } = property;
+
+  if (rates.monthly) {
+    return `$${rates.monthly.toLocaleString()}/mo`;
+  } else if (rates.weekly) {
+    return `$${rates.weekly.toLocaleString()}/wk`;
+  } else if (rates.nightly) {
+    return `$${rates.nightly.toLocaleString()}/night`;
+  }
+};
+```
+
+## Custom Not Found and Loading Pages
+
+### custom not Found
+
+`app/not-found.jsx`
+]
+
+### Loading pages
+
+`app/loading.jsx`
+package --> `npm i react-spinners`
+
+```jsx
+"use client";
+
+import { ClipLoader } from "react-spinners";
+
+const override = {
+  display: "block",
+  margin: "0 auto",
+  //   borderColor: "red",
+};
+
+const LoadingPage = () => {
+  return (
+    <ClipLoader
+      color={"#3b82f6"}
+      cssOverride={override}
+      size={150}
+      aria-label="Loading Spinner"
+    />
+  );
+};
+
+export default LoadingPage;
+```
+
+# MongoDB Database
+
+## Database Connection and Mongoose(ODM -Object Data Modeling)
+
+`npm i mongodb mongoose`
+
+- create in the root `config/database.js`
