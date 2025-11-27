@@ -231,4 +231,90 @@ export default LoadingPage;
 
 `npm i mongodb mongoose`
 
-- create in the root `config/database.js`
+- Create in the root `config/database.js`
+- All our mongoose call are `async`
+
+### MongoDB Connection
+
+```js
+import mongoose from "mongoose";
+
+let connected = false;
+
+export const connectDB = async () => {
+  mongoose.set *= ("strictQuery", true);
+
+  if (connected) {
+    console.log("MongoDB is connected");
+
+    return;
+  }
+
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    connected = true;
+  } catch (error) {
+    console.log(error);
+  }
+};
+```
+
+## Model
+
+`type: Schema.Types.ObjectId, ref: 'Product'` to link an `Order` document to a `Product` document.
+
+**User Model**
+
+```js
+import mongoose, { model, models } from "mongoose";
+const { Schema } = mongoose;
+
+const UserSchema = new Schema(
+  {
+    email: {
+      type: String,
+      unique: [true, "Email is alreay exists"],
+      required: [true, "Email is required"],
+    },
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+    },
+    image: {
+      type: String,
+    },
+    bookmarks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Property",
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const User = models.User || model("User", UserSchema);
+
+export default User;
+```
+
+## Fetch Data As Server Components:
+
+#### GET
+
+```ts
+import { connectDB } from "@/config/database";
+import Property from "@/models/Property";
+
+await connectDB();
+const properties = await Property.find({}).lean(); // lean() -- will convert into JS Object from mongoose object
+```
+
+```js
+const recentProperties = await Property.find({})
+  .lean()
+  .sort({ createdAt: -1 }) // sorted at the newest first
+  .limit(3);
+```
