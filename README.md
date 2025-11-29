@@ -318,3 +318,29 @@ const recentProperties = await Property.find({})
   .sort({ createdAt: -1 }) // sorted at the newest first
   .limit(3);
 ```
+
+# Authentication
+
+`npm install next-auth`
+
+## Protext Route
+
+```js
+export { default } from "next-auth/middleware";
+
+export const config = {
+  matcher: ["/properties/add", "/prfile", "/properties/saved", "/messages"],
+};
+```
+
+# Section - 5: Server Actions and Creating Properties
+
+## Server Actions:
+
+```jsx
+<form action={addProperty}> </form>;
+
+async function addProperty(formData) {}
+```
+## Custom Error Page
+app folder --> create `app/error.jsx`
